@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from decouple import config
+
+TMDB_ACCESS_TOKEN = config('TMDB_ACCESS_TOKEN')
+TMDB_BASE_URL = "https://api.themoviedb.org/3"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'movie_api',
-    'authentication'
+    'authentication',
+
+    'requests',
 ]
 
 REST_FRAMEWORK = {
