@@ -1,3 +1,53 @@
-from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
 
-# Create your views here.
+from .movie_service import TMDBClient
+from .serializers import SearchMovieResultSerializer
+
+
+
+class MovieSearchView(APIView):
+    def get(self, request):
+        query = request.query_params.get('query')
+        if not query:
+            return Response(
+                {'error': 'Parameter query ir required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            page = int(request.query_params.get('page', 1))
+        except (TypeError, ValueError):
+            page = 1
+
+        
+        client = TMDBClient()
+
+        try:
+            raw_data = client.search_movies_by_text(query, page)
+
+        except requests.exceptions.Timeout:
+            return Response(
+                {'error': 'Timeout: time exceeded for TMDB request'},
+                status=status.HTTP_504_GATEWAY_TIMEOUT
+            )
+        
+        except requests.exceptions.HTTPError:
+            return Response(
+                {'error': 'Error while querying TMDB'},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+        
+        serializer = SearchMovieResultSerializer(data=raw_data['results'], many=True)
+        serializer.is_valid(raise_exception=True)
+
+        return Response({
+            'page': raw_data['page'],
+            'total_pages': raw_data['total_pages'],
+            'total_results': raw_data['total_results'],
+            'results': serializer.data
+        })
+
+

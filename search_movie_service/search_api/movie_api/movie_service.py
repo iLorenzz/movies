@@ -12,16 +12,23 @@ class TMDBClient:
         }
 
     def search_movies_by_text(self, query_param, page):
-        if page == None:
-            page = 1
-
         response = requests.get(
             f'{self.base_url}/search/movie',
             headers=self.headers,
             params={'query': query_param, 'page': page},
-            timeout=10
+            timeout=5
         )
 
         response.raise_for_status()
-        return response
+        return response.json()
+    
+    def search_movie_credits(self, movie_id):
+        response = requests.get(
+            f'{self.base_url}/movie/{movie_id}/credits',
+            headers=self.headers,
+            timeout=5
+        )
+
+        response.raise_for_status()
+        return response.json()
         
