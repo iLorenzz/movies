@@ -1,9 +1,12 @@
 import requests
 from django.conf import settings
+from django.core.cache import cache
 
 
 
 class TMDBClient:
+    CACHE_TTL = 3600
+
     def __init__(self):
         self.base_url = settings.TMDB_BASE_URL
         self.headers = {
@@ -23,6 +26,12 @@ class TMDBClient:
         return response.json()
     
     def search_movie_details(self, movie_id):
+        cache_key = f'tmdb_movie_{movie_id}'
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+            return cached_data
+
         response = requests.get(
             f'{self.base_url}/movie/{movie_id}',
             headers=self.headers,
@@ -34,5 +43,8 @@ class TMDBClient:
         data = response.json()
 
         data['credits']['cast'] = data['credits']['cast'][:4]
+
+        cache.set(cache_key, data, self.CACHE_TTL)
         return data
+    
         
