@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { display } from '@/lib/fonts';
 import { useLogin } from '@/features/auth/hooks/loginHook';
 
 export function LoginForm() {
@@ -11,10 +12,10 @@ export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const result = await login(email, password);
-    if (result.ok) router.push('/movies');
+    if (result.ok) router.push('/');
   }
 
   return (

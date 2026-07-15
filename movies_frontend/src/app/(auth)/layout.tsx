@@ -1,8 +1,15 @@
+import { display } from '@/lib/fonts';
 import { body } from '@/lib/fonts';
+import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${body.className} min-h-screen flex items-center justify-center bg-[#14141A] bg-[radial-gradient(ellipse_at_top,_#1F1E29_0%,_#14141A_60%)] px-4`}>
+    <div className={`${body.className} min-h-screen flex flex-col gap-3 items-center justify-center bg-[#14141A] bg-[radial-gradient(ellipse_at_top,_#1F1E29_0%,_#14141A_60%)] px-4`}>
+      <header className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
+        <Link href="/" className={`${display.className} text-3xl tracking-[0.15em] text-[#F6F1E7]`}>
+          OCTAGRAM
+        </Link>
+      </header>
       <div className="relative w-full max-w-sm motion-safe:animate-[fadeIn_0.4s_ease-out]">
         <div className="absolute -top-2 left-0 right-0 flex justify-center gap-3 px-8">
           {Array.from({ length: 10 }).map((_, i) => (

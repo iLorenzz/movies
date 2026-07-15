@@ -20,35 +20,26 @@ export function RegisterForm() {
   const isLoading = isRegistering || isLoggingIn;
   const error = registerError || loginError;
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const registerResult = await register(email, password);
     if (!registerResult.ok) return;
 
     const loginResult = await login(email, password);
-    if (loginResult.ok) router.push('/movies');
+    if (loginResult.ok) router.push('/');
   }
 
   return (
-    <div className={`${body.className} min-h-screen flex items-center justify-center bg-[#14141A] bg-[radial-gradient(ellipse_at_top,_#1F1E29_0%,_#14141A_60%)] px-4`}>
-      <div className="relative w-full max-w-sm motion-safe:animate-[fadeIn_0.4s_ease-out]">
-        {/* Perfuração estilo rolo de filme, no topo do card */}
-        <div className="absolute -top-2 left-0 right-0 flex justify-center gap-3 px-8">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <span key={i} className="h-3 w-3 rounded-full bg-[#14141A]" />
-          ))}
-        </div>
-
-        <div className="rounded-2xl bg-[#F6F1E7] px-8 pt-9 pb-8 shadow-[0_20px_60px_-15px_rgba(163,38,56,0.35)]">
+          <>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A32638]">
-            Sessão gratuita
+            Free Session
           </p>
           <h1 className={`${display.className} text-4xl tracking-wide text-[#221F1A] mt-1`}>
-            Crie sua conta
+            New Account
           </h1>
           <p className="text-sm text-[#8A8477] mt-2">
-            Avalie filmes e monte sua lista de assistidos.
+            Rate films and build your watched list
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -70,7 +61,7 @@ export function RegisterForm() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-[#221F1A]">
-                Senha
+                Password
               </label>
               <input
                 id="password"
@@ -95,18 +86,16 @@ export function RegisterForm() {
               disabled={isLoading}
               className="w-full rounded-lg bg-[#A32638] py-2.5 text-sm font-semibold text-[#F6F1E7] transition hover:bg-[#7E1D2B] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A32638] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6F1E7]"
             >
-              {isLoading ? 'Criando conta...' : 'Criar conta'}
+              {isLoading ? 'Signing up...' : 'Sign up'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-[#8A8477]">
-            Já tem conta?{' '}
+            Already have an accout?{' '}
             <a href="/login" className="font-medium text-[#A32638] hover:underline">
-              Entrar
+              Login
             </a>
           </p>
-        </div>
-      </div>
-    </div>
+        </>
   );
 }
