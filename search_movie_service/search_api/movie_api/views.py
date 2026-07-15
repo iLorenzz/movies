@@ -100,21 +100,45 @@ class RatingDetailView(APIView):
     def get(self, request, id):
         rating = self.get_object(id, request.user)
         serializer = RatingSerializer(rating)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
         
     def put(self, request, id):
         rating = self.get_object(id, request.user)
         serializer = RatingSerializer(rating, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def delete(self, request, id):
         rating = self.get_object(id, request.user)
         rating.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-            
-        
+    
+class RatingSearchByUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        ratings = Rating.objects.filter(user_id=request.user)
+        movie_ids = [r.movie_id for r in ratings]
+
+
+        client = TMDBClient()
+        movies = client.search_movies_details_bulk(movie_ids)
+        movies_by_id = {m['id']: m for m in movies}
+
+        results = []
+        for rating in ratings:
+            movie = movies_by_id.get(rating.movie_id)
+
+            results.append({
+                'rating_id': rating.id,
+                'score': rating.score,
+                'movie_id': rating.movie_id,
+                'title': movie['title'] if movie else None,
+                'poster_patch': movie['poster_path'] if movie else None,
+            })
+
+        return Response(results, status=status.HTTP_200_OK)
 
 

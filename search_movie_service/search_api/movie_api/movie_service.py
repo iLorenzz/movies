@@ -2,6 +2,8 @@ import requests
 from django.conf import settings
 from django.core.cache import cache
 
+from concurrent.futures import ThreadPoolExecutor
+
 
 
 class TMDBClient:
@@ -46,5 +48,26 @@ class TMDBClient:
 
         cache.set(cache_key, data, self.CACHE_TTL)
         return data
+    
+    def search_movies_details_bulk(self, movie_ids):
+        cached_results = {}
+        ids_to_fetch = []
+
+        for movie_id in movie_ids:
+            cached = cache.get(f'tmdb_movie_{movie_id}')
+
+            if cached is not None:
+                cached_results[movie_id] = cached
+            else:
+                ids_to_fetch.append(movie_id)
+        
+        if ids_to_fetch:
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                fetched = executor.map(self.search_movie_details, ids_to_fetch)
+
+                for movie_id, data in zip(ids_to_fetch, fetched):
+                    cached_results[movie_id] = data
+
+        return [cached_results[index] for index in movie_ids]
     
         
