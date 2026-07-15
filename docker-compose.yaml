@@ -1,8 +1,8 @@
 services:
   movie_search_api:
-    container_name: movie_search_api
+    container_name: movie_search_api_v1
     build:
-      context: ./search_api
+      context: ./search_movie_service/search_api
       dockerfile: Dockerfile
     deploy:
       resources:
@@ -20,8 +20,6 @@ services:
       - "8000:8000"
     volumes:
       - sqlite_data:/app/data
-    networks:
-      - movie_search
     healthcheck:
       test:
         [
@@ -31,9 +29,22 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
- 
-networks:
-  movie_search:
+
+  movies_frontend:
+    container_name: movies_frontend_v1
+    build:
+      context: ./movies_frontend
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 2G
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    ports:
+      - "3000:3000"
  
 volumes:
   sqlite_data:

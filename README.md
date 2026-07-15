@@ -87,4 +87,4 @@ Algumas duvidas em realção a arquitetura MVT do Django foram sanadas em pesqui
 
 O mesmo tipo de uso do Claude no backend foi feito com o frontend
 porém, principalemnte para interfaces algumas escolhas de design também foram consultadas na Inteligência
-Artificial
+Artificial. Assim, o uso foi também com Spec Driven. 
