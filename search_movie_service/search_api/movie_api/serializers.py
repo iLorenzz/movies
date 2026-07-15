@@ -1,11 +1,16 @@
 from rest_framework import serializers
 from .models import Rating
 
+from .utils import build_poster_url
+
 
 class SearchMovieResultSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
-    poster_path = serializers.CharField(allow_null=True, allow_blank=True)
+    poster_path = serializers.SerializerMethodField()
+
+    def get_poster_path(self, obj):
+        return build_poster_url(obj.get('poster_path'))
 
 class CastActorSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -17,9 +22,12 @@ class CreditsSerializer(serializers.Serializer):
 class SearchMovieDetailsSerializer(serializers.Serializer):
     original_title = serializers.CharField()
     overview = serializers.CharField()
-    poster_path = serializers.CharField(allow_null=True, allow_blank=True)
+    poster_path = serializers.SerializerMethodField()
     release_date = serializers.CharField(allow_null=True, allow_blank=True)
     credits = CreditsSerializer()
+
+    def get_poster_path(self, obj):
+        return build_poster_url(obj.get('poster_path'))
 
 class RatingSerializer(serializers.ModelSerializer):
 

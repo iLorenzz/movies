@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 
 
+from .utils import build_poster_url
+
 
 
 class MovieSearchView(APIView):
@@ -46,8 +48,7 @@ class MovieSearchView(APIView):
                 status=status.HTTP_502_BAD_GATEWAY
             )
         
-        serializer = SearchMovieResultSerializer(data=raw_data['results'], many=True)
-        serializer.is_valid(raise_exception=True)
+        serializer = SearchMovieResultSerializer(raw_data['results'], many=True)
 
         return Response({
             'page': raw_data['page'],
@@ -73,9 +74,7 @@ class MovieDetailsView(APIView):
                 status=status.HTTP_504_GATEWAY_TIMEOUT
             )
         
-        serializer = SearchMovieDetailsSerializer(data=raw_data)
-        serializer.is_valid(raise_exception=True)
-
+        serializer = SearchMovieDetailsSerializer(raw_data)
         return Response(serializer.data)
     
 class RatingCreateView(APIView):
@@ -136,7 +135,7 @@ class RatingSearchByUserView(APIView):
                 'score': rating.score,
                 'movie_id': rating.movie_id,
                 'title': movie['title'] if movie else None,
-                'poster_patch': movie['poster_path'] if movie else None,
+                'poster_path': build_poster_url(movie['poster_path']) if movie else None,
             })
 
         return Response(results, status=status.HTTP_200_OK)
