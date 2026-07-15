@@ -14,7 +14,7 @@ class Rating(models.Model):
 
     movie_id = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True, auto_now=True)
 
     class Meta:
         unique_together = ('user_id', 'movie_id')

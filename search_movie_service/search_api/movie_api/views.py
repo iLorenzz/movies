@@ -1,10 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 import requests
 
 from .movie_service import TMDBClient
-from .serializers import SearchMovieResultSerializer, SearchMovieDetailsSerializer
+from .serializers import SearchMovieResultSerializer, SearchMovieDetailsSerializer, RatingSerializer
+from .models import Rating
+
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import PermissionDenied
+
 
 
 
@@ -58,12 +64,12 @@ class MovieDetailsView(APIView):
             raw_data = client.search_movie_details(id)
         except requests.exceptions.HTTPError:
             return Response(
-                {'error': 'Filme não encontrado no TMDB.'},
+                {'error': 'Movie not found in TMDB data base'},
                 status=status.HTTP_404_NOT_FOUND
             )
         except requests.exceptions.Timeout:
             return Response(
-                {'error': 'Tempo de resposta do TMDB esgotado.'},
+                {'error': 'Timeout: time exceeded for TMDB request'},
                 status=status.HTTP_504_GATEWAY_TIMEOUT
             )
         
@@ -71,7 +77,44 @@ class MovieDetailsView(APIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data)
+    
+class RatingCreateView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        serializer = RatingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save(user_id=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class RatingDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, id, user):
+        rating = get_object_or_404(Rating, pk=id)
+        if rating.user_id != user:
+            raise PermissionDenied('Editing this rate is not permitted')
+        return rating
+    
+    def get(self, request, id):
+        rating = self.get_object(id, request.user)
+        serializer = RatingSerializer(rating)
+        return Response(serializer.data)
+        
+    def put(self, request, id):
+        rating = self.get_object(id, request.user)
+        serializer = RatingSerializer(rating, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    def delete(self, request, id):
+        rating = self.get_object(id, request.user)
+        rating.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+            
         
 
 
