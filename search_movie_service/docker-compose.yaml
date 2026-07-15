@@ -1,0 +1,39 @@
+services:
+  movie_search_api:
+    container_name: movie_search_api
+    build:
+      context: ./search_api
+      dockerfile: Dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 512M
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=search_api.settings
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite_data:/app/data
+    networks:
+      - movie_search
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "bash -c '</dev/tcp/127.0.0.1/8000'",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+ 
+networks:
+  movie_search:
+ 
+volumes:
+  sqlite_data:
