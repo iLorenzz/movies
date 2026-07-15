@@ -22,13 +22,17 @@ class TMDBClient:
         response.raise_for_status()
         return response.json()
     
-    def search_movie_credits(self, movie_id):
+    def search_movie_details(self, movie_id):
         response = requests.get(
-            f'{self.base_url}/movie/{movie_id}/credits',
+            f'{self.base_url}/movie/{movie_id}',
             headers=self.headers,
+            params={'append_to_response': 'credits'},
             timeout=5
         )
 
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+
+        data['credits']['cast'] = data['credits']['cast'][:4]
+        return data
         
