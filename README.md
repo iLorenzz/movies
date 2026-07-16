@@ -51,7 +51,7 @@ possível ou mais fácil.
 1. Clone o repositório:
 ```bash
    git clone https://github.com/iLorenzz/movies/
-   cd movies/search_movie_service/
+   cd movies/
 ```
  
 2. Copie o arquivo de variáveis de ambiente de exemplo e preencha com seus próprios valores:
